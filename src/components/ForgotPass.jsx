@@ -5,6 +5,7 @@ import { Button, Form } from 'react-bootstrap';
 export default function ForgotPass() {
 	const initialFormState = {
 		email: '',
+		msg:''
 	};
 	const [formState, setFormState] = useState(
 		initialFormState
@@ -19,13 +20,27 @@ export default function ForgotPass() {
 		event.preventDefault();
 		forgotPass(formState)
 			.then((data) => {
-				console.log(data);
+				if (data.success) {
+					setFormState({
+			...formState,
+			msg: data.success,
+		});
+				}
+				if (data.errors) {
+					setFormState({
+			...formState,
+			msg: data.errors,
+		});
+				}
 			})
 			.catch((error) => console.log(error));
 	}
 	return (
 		<>
 			<Form className='container col-11 col-md-9 col-lg-4 bg-light my-5 p-5 rounded'>
+				<Form.Text className='text-primary'>
+						{formState.msg ? formState.msg : null}
+					</Form.Text>
 				<Form.Group
 					className='mb-5'
 					controlId='email'

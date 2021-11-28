@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { resetPass } from '../services/authServices';
 import { Button, Form } from 'react-bootstrap';
 
@@ -7,27 +7,47 @@ export default function ResetPass() {
 	const initialFormState = {
 		password: '',
 		password_confirmation: '',
+		token: '',
+		msg:''
 	};
 	const [formState, setFormState] = useState(
 		initialFormState
 	);
-	let history = useHistory();
+	const {token} = useParams()
 	function handleChange(event) {
 		setFormState({
 			...formState,
 			[event.target.name]: event.target.value,
+			msg:''
 		});
 	}
 	function handleResetPass(event) {
+		console.log(token);
 		event.preventDefault();
-		resetPass(formState).then((data) => {
-			console.log(data);
-			history.push('/');
+		setFormState({
+			...formState,
+			token: token,
 		});
+		if (formState.password === formState.password_confirmation) {
+			resetPass(formState).then((data) => {
+			console.log(data);
+		});
+		} else {
+			setFormState({
+			...formState,
+			msg: "Password does not match",
+		});
+
+		}
+		
+		
 	}
 	return (
 		<>
 			<Form className='container col-11 col-md-9 col-lg-4 bg-light my-5 p-5 rounded'>
+				<Form.Text className='text-danger'>
+						{formState.msg ? formState.msg : null}
+					</Form.Text>
 				<Form.Group
 					className='mb-3'
 					controlId='password'
@@ -57,10 +77,13 @@ export default function ResetPass() {
 						}
 						onChange={handleChange}
 					/>
+						<Form.Text className='text-muted'>
+						(6 characters minimum)
+					</Form.Text>
 				</Form.Group>
 
 				<div className='d-flex justify-content-between mt-5'>
-					<Button
+					<Button disabled={formState.password.length < 6 || formState.password_confirmation.length < 6}
 						variant='dark'
 						onClick={handleResetPass}
 					>

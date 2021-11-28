@@ -8,6 +8,7 @@ export default function SignIn({ history }) {
 	const initialFormState = {
 		email: '',
 		password: '',
+		errors:''
 	};
 	const [formState, setFormState] = useState(
 		initialFormState
@@ -17,25 +18,41 @@ export default function SignIn({ history }) {
 		setFormState({
 			...formState,
 			[event.target.name]: event.target.value,
+			
+			errors:''
 		});
 	}
 	function handleSubmit(event) {
 		event.preventDefault();
 		signIn(formState)
-			.then(({ username, jwt }) => {
-				console.log(username, jwt);
+			.then(({ username, jwt, errors }) => {
+	    if (errors) {
+					setFormState({
+			  ...formState,
+		  	errors: errors
+		   });
+	    } else {
+		    console.log(username, jwt, errors);
+				sessionStorage.setItem('token', jwt);
+				sessionStorage.setItem('user', username);
 				dispatch({
 					type: 'setLoggedInUser',
 					data: username,
 				});
 				dispatch({ type: 'setToken', data: jwt });
 				history.push('/');
-			})
+			
+			}
+				})
 			.catch((error) => console.log(error));
+				
 	}
 	return (
 		<>
 			<Form className='container col-11 col-md-9 col-lg-4 bg-light my-5 p-5 rounded'>
+				<Form.Text className='text-danger'>
+						{formState.errors ? formState.errors : null}
+					</Form.Text>
 				<Form.Group
 					className='mb-3'
 					controlId='email'
@@ -48,6 +65,10 @@ export default function SignIn({ history }) {
 						value={formState.email}
 						onChange={handleChange}
 					/>
+					<Form.Text className='text-muted'>
+						We'll never share your email with
+						anyone else.
+					</Form.Text>
 				</Form.Group>
 				<Form.Group
 					className='mb-3'

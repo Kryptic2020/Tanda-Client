@@ -5,7 +5,7 @@ export async function signUp(data) {
 	return response.data
 }
 export async function signIn(data) {
-	const response = await tandaAPI.post('/api/auth/sign-in', data)	
+	const response = await tandaAPI.post('/api/auth/sign-in', data)
 	return response.data
 }
 export async function signOut() {
@@ -13,7 +13,8 @@ export async function signOut() {
 	return "Logged out"
 }
 export async function forgotPass(data) {
-	const response = await tandaAPI.post('/api/auth/forgot-pass', data)	
+	const response = await tandaAPI.post('/api/auth/forgot-pass', data)
+	console.log(response.data)
 	return response.data
 }
 export async function resetPass(data) {

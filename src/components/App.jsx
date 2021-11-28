@@ -20,11 +20,13 @@ import Login from './Login';
 import Signup from './Signup';
 import ForgotPass from './ForgotPass';
 import ResetPass from './ResetPass';
+import Dashboard from './Dashboard'
+import EditOrganization from './EditOrganization'
+import ViewOrganization from './ViewOrganization'
+import Shift from './Shift'
 
 function App() {
 	const initialState = {
-		jokes: [],
-		categories: [],
 		loggedInUser:
 			sessionStorage.getItem('user') || null,
 		auth: {
@@ -35,19 +37,21 @@ function App() {
 		stateReducer,
 		initialState
 	);
+	
+	const { loggedInUser } = store
 	return (
 		<div>
 			<StateContext.Provider
 				value={{ store, dispatch }}
 			>
 				<BrowserRouter>
-					<Nav />
+					<Nav/>
 					<h1 className=' my-5 text-center'>
-						Tanda Compact
+						Tanda Express
 					</h1>
 					<Switch>
 						<Route exact path='/'>
-							<Redirect to='/' />
+							<Redirect to={loggedInUser ? '/dashboard':'/sign-in'} />
 						</Route>
 
 						<Route
@@ -63,8 +67,24 @@ function App() {
 							component={ForgotPass}
 						></Route>
 						<Route
-							path='/reset-pass'
+							path='/reset-pass/:token'
 							component={ResetPass}
+            ></Route>
+            <Route
+							path='/dashboard'
+							component={Dashboard}
+            ></Route>
+             <Route
+							path='/organization-update'
+							component={EditOrganization}
+            ></Route>
+            <Route
+							path='/organization-view'
+							component={ViewOrganization}
+						></Route>
+            <Route
+							path='/shift'
+							component={Shift}
 						></Route>
 
 						<Route component={NotFound} />
