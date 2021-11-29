@@ -3,6 +3,7 @@ import { useHistory, Link } from 'react-router-dom';
 import { signUp } from '../services/authServices';
 import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
+import { pattern } from '../utils/authValidation';
 
 export default function Signup() {
 	const initialFormState = {
@@ -10,6 +11,9 @@ export default function Signup() {
 		email: '',
 		password: '',
 		password_confirmation: '',
+		email_error: '',
+		password_error: '',
+		errors: '',
 	};
 	const [formState, setFormState] = useState(
 		initialFormState
@@ -20,23 +24,71 @@ export default function Signup() {
 		setFormState({
 			...formState,
 			[event.target.name]: event.target.value,
+			email_error: '',
+			errors: '',
 		});
 	}
 	function handleRegister(event) {
-		event.preventDefault();
-		signUp(formState).then((data) => {
-			sessionStorage.setItem('token', data.jwt);
-			sessionStorage.setItem('user', data.username);
-			dispatch({
-				type: 'setLoggedInUser',
-				data: data.username,
+		const isValid = pattern.test(formState.email);
+		if (isValid) {
+			if (
+				formState.password ===
+				formState.password_confirmation
+			) {
+				event.preventDefault();
+				signUp(formState).then((data) => {
+					if (data.errors) {
+						setFormState({
+							...formState,
+							errors: data.errors,
+						});
+					} else {
+						console.log(data);
+						sessionStorage.setItem(
+							'token',
+							data.jwt
+						);
+						sessionStorage.setItem(
+							'user',
+							data.username
+						);
+						sessionStorage.setItem(
+							'email',
+							formState.email
+						);
+						dispatch({
+							type: 'setLoggedInUser',
+							data: data.username,
+						});
+						dispatch({
+							type: 'setUserEmail',
+							data: formState.email,
+						});
+						history.push('/');
+					}
+				});
+			} else {
+				setFormState({
+					...formState,
+					password_error:
+						'Password does not match',
+				});
+			}
+		} else {
+			setFormState({
+				...formState,
+				email_error: 'Invalid email address',
 			});
-			history.push('/');
-		});
+		}
 	}
 	return (
 		<>
 			<Form className='container col-11 col-md-9 col-lg-4 bg-light my-5 p-5 rounded'>
+				<Form.Text className='text-danger'>
+					{formState.errors
+						? formState.errors
+						: null}
+				</Form.Text>
 				<Form.Group
 					className='mb-3'
 					controlId='name'
@@ -63,6 +115,11 @@ export default function Signup() {
 						value={formState.email}
 						onChange={handleChange}
 					/>
+					<Form.Text className='text-danger'>
+						{formState.email_error
+							? formState.email_error
+							: null}
+					</Form.Text>
 				</Form.Group>
 				<Form.Group
 					className='mb-3'
@@ -76,6 +133,9 @@ export default function Signup() {
 						value={formState.password}
 						onChange={handleChange}
 					/>
+					<Form.Text className='text-muted'>
+						(6 characters minimum)
+					</Form.Text>
 				</Form.Group>
 				<Form.Group
 					className='mb-3'
@@ -93,10 +153,22 @@ export default function Signup() {
 						}
 						onChange={handleChange}
 					/>
+					<Form.Text className='text-danger'>
+						{formState.password_error
+							? formState.password_error
+							: null}
+					</Form.Text>
 				</Form.Group>
 
 				<div className='d-flex justify-content-between mt-5'>
 					<Button
+						disabled={
+							!formState.email ||
+							formState.password.length < 6 ||
+							formState.password_confirmation
+								.length < 6 ||
+							!formState.username
+						}
 						variant='dark'
 						onClick={handleRegister}
 					>
