@@ -8,17 +8,17 @@ export default function ResetPass() {
 		password: '',
 		password_confirmation: '',
 		token: '',
-		msg:''
+		msg: '',
 	};
 	const [formState, setFormState] = useState(
 		initialFormState
 	);
-	const {token} = useParams()
+	const { token } = useParams();
 	function handleChange(event) {
 		setFormState({
 			...formState,
 			[event.target.name]: event.target.value,
-			msg:''
+			msg: '',
 		});
 	}
 	function handleResetPass(event) {
@@ -28,26 +28,26 @@ export default function ResetPass() {
 			...formState,
 			token: token,
 		});
-		if (formState.password === formState.password_confirmation) {
+		if (
+			formState.password ===
+			formState.password_confirmation
+		) {
 			resetPass(formState).then((data) => {
-			console.log(data);
-		});
+				console.log(data);
+			});
 		} else {
 			setFormState({
-			...formState,
-			msg: "Password does not match",
-		});
-
+				...formState,
+				msg: 'Password does not match',
+			});
 		}
-		
-		
 	}
 	return (
 		<>
 			<Form className='container col-11 col-md-9 col-lg-4 bg-light my-5 p-5 rounded'>
 				<Form.Text className='text-danger'>
-						{formState.msg ? formState.msg : null}
-					</Form.Text>
+					{formState.msg ? formState.msg : null}
+				</Form.Text>
 				<Form.Group
 					className='mb-3'
 					controlId='password'
@@ -77,13 +77,18 @@ export default function ResetPass() {
 						}
 						onChange={handleChange}
 					/>
-						<Form.Text className='text-muted'>
+					<Form.Text className='text-muted'>
 						(6 characters minimum)
 					</Form.Text>
 				</Form.Group>
 
 				<div className='d-flex justify-content-between mt-5'>
-					<Button disabled={formState.password.length < 6 || formState.password_confirmation.length < 6}
+					<Button
+						disabled={
+							formState.password.length < 6 ||
+							formState.password_confirmation
+								.length < 6
+						}
 						variant='dark'
 						onClick={handleResetPass}
 					>

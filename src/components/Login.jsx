@@ -8,7 +8,7 @@ export default function SignIn({ history }) {
 	const initialFormState = {
 		email: '',
 		password: '',
-		errors:''
+		errors: '',
 	};
 	const [formState, setFormState] = useState(
 		initialFormState
@@ -18,49 +18,55 @@ export default function SignIn({ history }) {
 		setFormState({
 			...formState,
 			[event.target.name]: event.target.value,
-			
-			errors:''
+
+			errors: '',
 		});
 	}
 	function handleSubmit(event) {
 		event.preventDefault();
 		signIn(formState)
 			.then(({ username, jwt, errors }) => {
-	    if (errors) {
+				if (errors) {
 					setFormState({
-			  ...formState,
-		  	errors: errors
-		   });
-	    } else {
-		    console.log(username, jwt, errors);
-				sessionStorage.setItem('token', jwt);
-				sessionStorage.setItem('user', username);
-				sessionStorage.setItem(
+						...formState,
+						errors: errors,
+					});
+				} else {
+					console.log(username, jwt, errors);
+					sessionStorage.setItem('token', jwt);
+					sessionStorage.setItem(
+						'user',
+						username
+					);
+					sessionStorage.setItem(
 						'email',
 						formState.email
 					);
-				dispatch({
-					type: 'setLoggedInUser',
-					data: username,
-				});
-				dispatch({
-					type: 'setUserEmail',
-					data: formState.email,
-				});
-				dispatch({ type: 'setToken', data: jwt });
-				history.push('/');
-			
-			}
-				})
+					dispatch({
+						type: 'setLoggedInUser',
+						data: username,
+					});
+					dispatch({
+						type: 'setUserEmail',
+						data: formState.email,
+					});
+					dispatch({
+						type: 'setToken',
+						data: jwt,
+					});
+					history.push('/');
+				}
+			})
 			.catch((error) => console.log(error));
-				
 	}
 	return (
 		<>
 			<Form className='container col-11 col-md-9 col-lg-4 bg-light my-5 p-5 rounded'>
 				<Form.Text className='text-danger'>
-						{formState.errors ? formState.errors : null}
-					</Form.Text>
+					{formState.errors
+						? formState.errors
+						: null}
+				</Form.Text>
 				<Form.Group
 					className='mb-3'
 					controlId='email'

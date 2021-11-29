@@ -1,7 +1,5 @@
 import React, {
-	useState,
 	useReducer,
-	useEffect,
 } from 'react';
 import stateReducer from '../utils/stateReducer';
 import { StateContext } from '../utils/stateContext';
@@ -13,7 +11,6 @@ import {
 } from 'react-router-dom';
 import NotFound from './NotFound';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import './App.css';
 import Nav from './NavigationBar';
 import Login from './Login';
