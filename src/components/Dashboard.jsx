@@ -1,60 +1,167 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { signIn } from '../services/authServices';
+import {
+	getOrgs,
+	joinOrg,
+	newOrg,
+	getJoinedOrgs,
+} from '../services/organizationServices';
 import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
 
-export default function Dashboard({ history }) {
+export default function Dashboard() {
+	const { userEmail } = useGlobalState();
+
 	const initialFormState = {
 		name: '',
 		hourly_rate: '',
+		user_email: userEmail,
+		org_id: '',
 	};
+
 	const [formState, setFormState] = useState(
 		initialFormState
 	);
-	const { dispatch } = useGlobalState();
+	const [orgState, setOrgState] = useState([]);
+	const [joinedOrgState, setjoinedOrgState] = useState(
+		[]
+	);
+	const [msgState, setMsgState] = useState();
+
+	function fetchOrgs() {
+		getOrgs().then((data) => {
+			setOrgState(data);
+		});
+	}
+
+	function fetchJoinedOrgs() {
+		getJoinedOrgs(formState).then((data) => {
+			setjoinedOrgState(data);
+		});
+	}
+
 	function handleChange(event) {
 		setFormState({
 			...formState,
 			[event.target.name]: event.target.value,
 		});
 	}
+
+	function handleJoin(id) {
+		const joined = joinedOrgState.find(
+			(el) => el.id === id
+		);
+		if (joined) {
+			setMsgState(
+				'You are already a member of this organization'
+			);
+			setTimeout(() => {
+				setMsgState('');
+			}, 3000);
+		} else {
+			const data = {
+				org_id: id,
+				user_email: userEmail,
+			};
+			joinOrg(data)
+				.then((data) => {
+					console.log(data);
+					fetchJoinedOrgs();
+				})
+				.catch((error) => console.log(error));
+		}
+	}
+
 	function handleSubmit(event) {
 		event.preventDefault();
-		signIn(formState)
-			.then(({ username, jwt }) => {
-				console.log(username, jwt);
-				dispatch({
-					type: 'setLoggedInUser',
-					data: username,
+		newOrg(formState)
+			.then(() => {
+				fetchOrgs();
+				fetchJoinedOrgs();
+				window.scrollTo(0, 0);
+				setFormState({
+					...formState,
+					name: '',
+					hourly_rate: '',
 				});
-				dispatch({ type: 'setToken', data: jwt });
-				history.push('/');
 			})
 			.catch((error) => console.log(error));
 	}
+
+	useEffect(() => {
+		fetchOrgs();
+		fetchJoinedOrgs();
+	}, []);
+
 	return (
 		<div className='bg-dark py-5 rounded d-flex flex-wrap mb-5'>
 			<section className='container col-11 col-md-9 col-lg-4 bg-light my-2 py-5 px-4 rounded'>
-				<h3>Organization list</h3>
-				<ul>
-					<li>
-						mc donalds{' '}
-						<Link className='mx-4' to='/organization-update'>
-							edit
-						</Link>{' '}
-						<Link to='/organization-view'>join</Link>
-					</li>
-				</ul>
+				<h5 className='m-4 text-danger'>
+					{msgState && msgState}
+				</h5>
+				<h3 className='m-4'>Organization list</h3>
+				{orgState &&
+					orgState.map((org, index) => (
+						<ul>
+							<li
+								key={index}
+								className='d-flex justify-content-between'
+							>
+								<p className='w-50 muted'>
+									{org.name}
+								</p>
+								<div>
+									<Link
+										to={`/organization/update/${org.id}`}
+									>
+										<Button
+											className='mx-3 btn btn-sm'
+											variant='primary'
+										>
+											Edit
+										</Button>
+									</Link>
+									<Button
+										className='btn btn-sm'
+										variant='dark'
+										onClick={() =>
+											handleJoin(
+												org.id
+											)
+										}
+									>
+										join
+									</Button>
+								</div>
+							</li>
+						</ul>
+					))}
 			</section>
 			<section className='container col-11 col-md-9 col-lg-4 bg-light my-2 py-5 px-4 rounded'>
-				<h3>Joined list</h3>
-				<ul>
-					<li>
-						burger king{' '}
-						<Link to='/organization-view'>select</Link>
-					</li>
-				</ul>
+				<h3 className='m-4'>Joined list</h3>
+				{joinedOrgState &&
+					joinedOrgState.map((org, index) => (
+						<ul>
+							<li
+								key={index}
+								className='d-flex justify-content-between'
+							>
+								<p className='w-50 muted'>
+									{org.name}
+								</p>
+								<Link
+									to={`/organization/show/${org.id}`}
+								>
+									<Button
+										className='mx-3 btn btn-sm'
+										variant='info'
+									>
+										See
+									</Button>
+								</Link>
+							</li>
+						</ul>
+					))}
 			</section>
 
 			<section className='container col-11 col-md-9 col-lg-3 bg-light my-2 py-5 px-4 rounded'>

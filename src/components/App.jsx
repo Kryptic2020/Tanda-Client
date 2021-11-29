@@ -22,11 +22,13 @@ import ForgotPass from './ForgotPass';
 import ResetPass from './ResetPass';
 import Dashboard from './Dashboard'
 import EditOrganization from './EditOrganization'
-import ViewOrganization from './ViewOrganization'
+import ShowOrganization from './ShowOrganization'
 import Shift from './Shift'
 
 function App() {
 	const initialState = {
+		userEmail:
+			sessionStorage.getItem('email') || null,
 		loggedInUser:
 			sessionStorage.getItem('user') || null,
 		auth: {
@@ -38,11 +40,11 @@ function App() {
 		initialState
 	);
 	
-	const { loggedInUser } = store
+	const { loggedInUser, userEmail } = store
 	return (
 		<div>
 			<StateContext.Provider
-				value={{ store, dispatch }}
+				value={{ store, dispatch, userEmail }}
 			>
 				<BrowserRouter>
 					<Nav/>
@@ -75,15 +77,15 @@ function App() {
 							component={Dashboard}
             ></Route>
              <Route
-							path='/organization-update'
+							path='/organization/update/:id'
 							component={EditOrganization}
             ></Route>
             <Route
-							path='/organization-view'
-							component={ViewOrganization}
+							path='/organization/show/:id'
+							component={ShowOrganization}
 						></Route>
             <Route
-							path='/shift'
+							path='/shift/:id'
 							component={Shift}
 						></Route>
 

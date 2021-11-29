@@ -35,9 +35,17 @@ export default function SignIn({ history }) {
 		    console.log(username, jwt, errors);
 				sessionStorage.setItem('token', jwt);
 				sessionStorage.setItem('user', username);
+				sessionStorage.setItem(
+						'email',
+						formState.email
+					);
 				dispatch({
 					type: 'setLoggedInUser',
 					data: username,
+				});
+				dispatch({
+					type: 'setUserEmail',
+					data: formState.email,
 				});
 				dispatch({ type: 'setToken', data: jwt });
 				history.push('/');

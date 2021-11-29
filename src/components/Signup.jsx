@@ -13,7 +13,7 @@ export default function Signup() {
 		password_confirmation: '',
 		email_error: '',
 		password_error: '',
-		errors:''
+		errors: '',
 	};
 	const [formState, setFormState] = useState(
 		initialFormState
@@ -25,7 +25,7 @@ export default function Signup() {
 			...formState,
 			[event.target.name]: event.target.value,
 			email_error: '',
-			errors:''
+			errors: '',
 		});
 	}
 	function handleRegister(event) {
@@ -37,27 +37,35 @@ export default function Signup() {
 			) {
 				event.preventDefault();
 				signUp(formState).then((data) => {
-					if (data.errors){setFormState({
-			  ...formState,
-		  	errors: data.errors
-					});
+					if (data.errors) {
+						setFormState({
+							...formState,
+							errors: data.errors,
+						});
 					} else {
-					console.log(data)
-					sessionStorage.setItem(
-						'token',
-						data.jwt
-					);
-					sessionStorage.setItem(
-						'user',
-						data.username
-					);
-					dispatch({
-						type: 'setLoggedInUser',
-						data: data.username,
-					});
-					history.push('/');	
-			 }
-					
+						console.log(data);
+						sessionStorage.setItem(
+							'token',
+							data.jwt
+						);
+						sessionStorage.setItem(
+							'user',
+							data.username
+						);
+						sessionStorage.setItem(
+							'email',
+							formState.email
+						);
+						dispatch({
+							type: 'setLoggedInUser',
+							data: data.username,
+						});
+						dispatch({
+							type: 'setUserEmail',
+							data: formState.email,
+						});
+						history.push('/');
+					}
 				});
 			} else {
 				setFormState({
@@ -76,9 +84,11 @@ export default function Signup() {
 	return (
 		<>
 			<Form className='container col-11 col-md-9 col-lg-4 bg-light my-5 p-5 rounded'>
-			<Form.Text className='text-danger'>
-						{formState.errors ? formState.errors : null}
-					</Form.Text>
+				<Form.Text className='text-danger'>
+					{formState.errors
+						? formState.errors
+						: null}
+				</Form.Text>
 				<Form.Group
 					className='mb-3'
 					controlId='name'

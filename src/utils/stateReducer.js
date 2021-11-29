@@ -37,6 +37,12 @@ export default function reducer (state, action) {
 				loggedInUser: action.data
 			}
 		}
+		case 'setUserEmail': {
+			return {
+				...state,
+				userEmail: action.data
+			}
+	  }
 		case 'setToken': {
 			return {
 				...state,
