@@ -1,5 +1,5 @@
 import React, {
-	useReducer,
+	useReducer,useEffect
 } from 'react';
 import stateReducer from '../utils/stateReducer';
 import { StateContext } from '../utils/stateContext';
@@ -21,9 +21,11 @@ import Dashboard from './Dashboard'
 import EditOrganization from './EditOrganization'
 import ShowOrganization from './ShowOrganization'
 import Shift from './Shift'
+import { getCurrentUser } from '../services/authServices';
 
 function App() {
 	const initialState = {
+		current_user:{},
 		userEmail:
 			sessionStorage.getItem('email') || null,
 		loggedInUser:
@@ -38,6 +40,17 @@ function App() {
 	);
 	
 	const { loggedInUser, userEmail } = store
+
+	useEffect(() => {
+		getCurrentUser({ email:userEmail }).then((data) => {
+			dispatch({
+						type: 'setUser',
+						data: data,
+			})
+				;
+		})
+		
+	},[])
 	return (
 		<div>
 			<StateContext.Provider

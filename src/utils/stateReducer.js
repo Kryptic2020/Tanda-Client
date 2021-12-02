@@ -37,6 +37,12 @@ export default function reducer (state, action) {
 				loggedInUser: action.data
 			}
 		}
+			case 'setUser': {
+			return {
+				...state,
+				current_user: action.data
+			}
+		}
 		case 'setUserEmail': {
 			return {
 				...state,

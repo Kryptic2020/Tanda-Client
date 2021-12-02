@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { signUp } from '../services/authServices';
 import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
@@ -18,6 +20,7 @@ export default function Signup() {
 	const [formState, setFormState] = useState(
 		initialFormState
 	);
+	const [visible, setVisible] = useState(false);
 	const { dispatch } = useGlobalState();
 	let history = useHistory();
 	function handleChange(event) {
@@ -127,7 +130,7 @@ export default function Signup() {
 				>
 					<Form.Label>Password</Form.Label>
 					<Form.Control
-						type='password'
+						type={visible ? 'text':'password'}
 						placeholder='Password'
 						name='password'
 						value={formState.password}
@@ -145,14 +148,30 @@ export default function Signup() {
 						Password Confirmation
 					</Form.Label>
 					<Form.Control
-						type='password'
+						type={visible ? 'text':'password'}
 						placeholder='Password Confirmation'
 						name='password_confirmation'
 						value={
 							formState.password_confirmation
 						}
 						onChange={handleChange}
-					/>
+					/><span class='s-viewer'>
+						{visible ? (
+							<VisibilityIcon
+								className=' w-100'
+								onClick={() =>
+									setVisible(false)
+								}
+							/>
+						) : (
+							<VisibilityOffIcon
+								className='w-100 '
+								onClick={() =>
+									setVisible(true)
+								}
+							/>
+						)}
+					</span>
 					<Form.Text className='text-danger'>
 						{formState.password_error
 							? formState.password_error

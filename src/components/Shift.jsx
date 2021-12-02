@@ -1,72 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Table } from 'react-bootstrap';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import TextField from '@mui/material/TextField';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import MobileTimePicker from '@mui/lab/MobileTimePicker';
+import { Table, Modal, Button,Tooltip,OverlayTrigger } from 'react-bootstrap';
 import { useGlobalState } from '../utils/stateContext';
 import {
-	newShift,
-	shifts,
+	shifts,deleteShift
 } from '../services/shiftServices';
 import { showOrg } from '../services/organizationServices';
+import CreateIcon from '@mui/icons-material/Create';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ShiftForm from './ShiftForm';
+import BreakForm from './BreakForm';
 
 export default function Shift(history) {
 	const { store } = useGlobalState();
-	const { loggedInUser, userEmail } = store;
+	const {current_user } = store;
 
-	const [dateState, setDateState] = useState(new Date());
-	const [startTimeState, setStartTimeState] =
-		useState(null);
-	const [finishTimeState, setFinishTimeState] =
-		useState(null);
-	const [breakState, setBreakState] = useState();
+	
+	//const [breakState, setBreakState] = useState();
 	const [shiftsState, setShiftsState] = useState([{}]);
+	const [shiftState, setShiftState] = useState({});
 	const [orgState, setOrgState] = useState({});
+	const [showModalCreate, setShowModalCreate] = useState(false);
+	const [showModalUpdate, setShowModalUpdate] = useState(false);
+	const [showModalBreak, setShowModalBreak] = useState(false);
+	const handleCloseModal = () => { setShowModalBreak(false);setShowModalCreate(false); setShowModalUpdate(false); set_table();}
+	
 
-	//const [show, setShow] = useState(false);
-	//const handleClose = () => setShow(false);
-	//const handleShow = () => setShow(true);
 
-	function handleSubmit() {
-		const formData = {
-			user_email: userEmail,
-			org_id: history.match.params.id,
-			date: dateState,
-			start_time: startTimeState,
-			finish_time: finishTimeState,
-			break: breakState,
-		};
-		newShift(formData)
-			.then((data) => {
-				console.log(data);
-				seTable();
-				window.scrollTo(0, 0);
-			})
-			.catch((error) => console.log(error));
-	}
+  const org_id = history.match.params.id
 
-	function seTable() {
-		shifts(history.match.params.id).then((data) => {
-			console.log(data);
+	const set_table = () => {
+		shifts(org_id).then((data) => {
 			setShiftsState(data);
 		});
-		showOrg(history.match.params.id).then((data) => {
+		showOrg(org_id).then((data) => {
 			setOrgState(data);
 		});
-	}
+	}	
 
-	function handleChange(event) {
-		setBreakState(event.target.value);
-	}
-	useEffect(() => {
-		seTable();
-	}, []);
-
-	const convertDate = (date) => {
+	function convertDate(date) {
 		return new Date(date).toLocaleDateString('es-ES', {
 			year: 'numeric',
 			month: 'numeric',
@@ -74,36 +48,53 @@ export default function Shift(history) {
 		});
 	};
 
-	const convertTime = (data) => {
+	function convertTime(data) {
 		let time =
 			new Date(data).getHours() +
 			':' +
-			new Date(data).getMinutes();
+			((new Date(data).getMinutes()<10?'0':'') + new Date(data).getMinutes());
 		return time;
 	};
 
-	const getWorkedHours = (start, finish, coffee) => {
+	function getWorkedHours(start, finish, coffee) {
 		const end =
 			new Date(finish).getTime() / (1000 * 60);
 		const init =
 			new Date(start).getTime() / (1000 * 60);
 		const result = end - init - coffee;
-		return Math.round(result);
+		return (Math.round(result)/600).toFixed(2);
 	};
-	// const modal = (<Modal show={show} onHide={handleClose} animation={false}>
-	//     <Modal.Header closeButton>
-	//       <Modal.Title>Modal heading</Modal.Title>
-	//     </Modal.Header>
-	//     <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-	//     <Modal.Footer>
-	//       <Button variant="secondary" onClick={handleClose}>
-	//         Close
-	//       </Button>
-	//       <Button variant="primary" onClick={handleClose}>
-	//         Save Changes
-	//       </Button>
-	//     </Modal.Footer>
-	// </Modal>)
+	const modalCreateShift = (
+		<Modal fullscreen={true} show={showModalCreate} onHide={handleCloseModal} animation={false}>
+	    <Modal.Header className="bg-light" closeButton>
+	    </Modal.Header>
+		  <Modal.Body >
+			  <ShiftForm set_table={set_table} close_modal={handleCloseModal} org_id={org_id} />
+		  </Modal.Body>
+		</Modal>
+	)
+
+	const modalUpdateShift = (
+		<Modal fullscreen={true} show={showModalUpdate} onHide={handleCloseModal} animation={false}>
+	    <Modal.Header className="bg-light" closeButton>
+	    </Modal.Header>
+		  <Modal.Body >
+			  <ShiftForm set_table={set_table} close_modal={handleCloseModal} shift={shiftState} />
+		  </Modal.Body>
+		</Modal>
+	)
+
+	const modalUpdateBreak = (
+		<Modal fullscreen={true} show={showModalBreak} onHide={handleCloseModal} animation={false}>
+	    <Modal.Header className="bg-light" closeButton>
+	    </Modal.Header>
+		  <Modal.Body >
+			 <BreakForm close_modal={handleCloseModal} shift={shiftState}/>
+		  </Modal.Body>
+		</Modal>
+	)
+		
+	
 
 	const table_heading = [
 		'Employee name',
@@ -111,19 +102,56 @@ export default function Shift(history) {
 		'Start time',
 		'Finish time',
 		'Break length (minutes)',
+		'Add/ Remove Breaks',
 		'Hours worked',
 		'Overnigth hours',
 		'Shift cost',
+		'Edit',
+		'Delete'
 	];
+	function handleAddBreak(shift) {
+		setShiftState(shift)
+   setShowModalBreak(true)
+	
+	}
+	function handleUpdateShift(shift) {
+		setShiftState(shift)
+	 setShowModalUpdate(true)
+	}
 
+	const renderTooltip = (props) => (
+  <Tooltip id="button-tooltip" {...props}>
+    Click here to Add a Shift
+  </Tooltip>
+);
+	
+function handleDelete(id) {
+	deleteShift(id);
+	set_table();
+	}
+
+	useEffect(() => {
+		set_table();
+	}, []);
 	return (
 		<>
 			<div className='col-12 col-md-11 m-auto'>
 				<h2 className='my-5 text-center'>
 					{orgState.name}
 				</h2>
+				{modalUpdateShift}
+				{modalCreateShift}
+				{modalUpdateBreak}
 				<div className='d-flex justify-content-between'>
-					<h5 className='px-3'>Shifts</h5>
+					 <OverlayTrigger
+							placement="top"
+							delay={{ show: 250, hide: 400 }}
+							overlay={renderTooltip}
+						>
+						<Button variant="primary" className='p-2' onClick={() => { setShowModalCreate(true); }}>
+							<AddCircleOutlineIcon className="mx-2" />Add Shifts
+						</Button>
+					</OverlayTrigger>
 					<Link className='px-3' to='/dashboard'>
 						Back
 					</Link>
@@ -151,7 +179,7 @@ export default function Shift(history) {
 					<tbody>
 						{shiftsState &&
 							shiftsState.map((el, index) => (
-								<tr>
+								<tr className="m-auto text-center">
 									<td>{index}</td>
 									<td>{el.name}</td>
 									<td>
@@ -170,6 +198,7 @@ export default function Shift(history) {
 										)}
 									</td>
 									<td>{el.break}</td>
+									<td>{current_user.id === el.user_id ? <AddCircleIcon className="text-secondary" onClick={() => { handleAddBreak(el); }} />:null}</td>
 									<td>
 										{getWorkedHours(
 											el.start,
@@ -195,88 +224,14 @@ export default function Shift(history) {
 											}
 										)}
 									</td>
+									<td>{current_user.id === el.user_id ?<CreateIcon className="text-secondary" onClick={() => { handleUpdateShift(el); }} />:null}</td>
+										<td>{current_user.id === el.user_id ? <DeleteIcon className="text-secondary" onClick={() => { handleDelete(el.id); }} />:null}</td>
 								</tr>
+								
 							))}
 					</tbody>
 				</Table>
 			</div>
-			<LocalizationProvider
-				dateAdapter={AdapterDateFns}
-			>
-				<h3 className='text-center rounded p-5 m-0'>
-					Enter shift
-				</h3>
-				{/* {modal} */}
-				<div className='rounded mb-5 mx-auto py-5 py-lg-1 d-flex flex-wrap col-12 col-md-8 col-lg-11 bg-light text-center row'>
-					<div className='row col-10 col-lg-2 p-0 my-2 mx-auto'>
-						{' '}
-						<input
-							className='bg-light border height'
-							value={loggedInUser}
-							readOnly
-						></input>
-					</div>
-
-					<div className=' row col-10 col-lg-2 p-0 my-2 mx-auto'>
-						<DatePicker
-							className='bg-light border height'
-							dateFormat='dd/MM/yyyy'
-							selected={dateState}
-							onChange={(date) =>
-								setDateState(date)
-							}
-						/>
-					</div>
-					<div className='row col-10 col-lg-2 p-0 my-2 mx-auto'>
-						<MobileTimePicker
-							label='Start Time'
-							value={startTimeState}
-							onChange={(newValue) => {
-								setStartTimeState(newValue);
-							}}
-							renderInput={(params) => (
-								<TextField {...params} />
-							)}
-						/>
-					</div>
-					<div className='row col-10 col-lg-2 p-0 my-2 mx-auto'>
-						<MobileTimePicker
-							label='Finish Time'
-							value={finishTimeState}
-							onChange={(newValue) => {
-								setFinishTimeState(
-									newValue
-								);
-							}}
-							renderInput={(params) => (
-								<TextField {...params} />
-							)}
-						/>
-					</div>
-
-					<div className='row col-10 col-lg-2 p-0 my-2 mx-auto'>
-						{' '}
-						<input
-							type='number'
-							value={breakState}
-							className='bg-light border height'
-							placeholder='Enter Break (minutes only)'
-							onChange={handleChange}
-						></input>
-					</div>
-					<Button
-						className='btn btn-lg col-10 col-lg-1 my-5 my-lg-2 mx-auto b-height row'
-						disabled={
-							!startTimeState ||
-							!finishTimeState ||
-							!breakState
-						}
-						onClick={handleSubmit}
-					>
-						Submit
-					</Button>
-				</div>
-			</LocalizationProvider>
 		</>
 	);
 }
