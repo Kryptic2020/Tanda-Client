@@ -103,5 +103,7 @@ This challenge is to create a highly simplified version of the Tanda web app fro
 ![pics](./img/ShiftAdd-Datepicker.png)
 ![pics](./img/ShiftAdd-Timepicker.png)  
 ![pics](./img/ShiftEdit.png)  
-![pics](./img/Breaks-Add&Remove.png)
+![pics](./img/Breaks-Add&Remove.png)  
+![pics](./img/Email-welcome.png)  
+![pics](./img/Email-resetPassLink.png)  
 
