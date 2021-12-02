@@ -1,6 +1,4 @@
-import React, {
-	useReducer,useEffect
-} from 'react';
+import React, { useReducer, useEffect } from 'react';
 import stateReducer from '../utils/stateReducer';
 import { StateContext } from '../utils/stateContext';
 import {
@@ -17,17 +15,17 @@ import Login from './Login';
 import Signup from './Signup';
 import ForgotPass from './ForgotPass';
 import ResetPass from './ResetPass';
-import Dashboard from './Dashboard'
-import EditOrganization from './EditOrganization'
-import ShowOrganization from './ShowOrganization'
-import Shift from './Shift'
+import Dashboard from './Dashboard';
+import EditOrganization from './EditOrganization';
+import ShowOrganization from './ShowOrganization';
+import Shift from './Shift';
 import { getCurrentUser } from '../services/authServices';
 
 function App() {
+	//State management
 	const initialState = {
-		current_user:{},
-		userEmail:
-			sessionStorage.getItem('email') || null,
+		current_user: {},
+		userEmail: sessionStorage.getItem('email') || null,
 		loggedInUser:
 			sessionStorage.getItem('user') || null,
 		auth: {
@@ -38,32 +36,40 @@ function App() {
 		stateReducer,
 		initialState
 	);
-	
-	const { loggedInUser, userEmail } = store
+
+	const { loggedInUser, userEmail } = store;
 
 	useEffect(() => {
-		getCurrentUser({ email:userEmail }).then((data) => {
-			dispatch({
-						type: 'setUser',
-						data: data,
-			})
-				;
-		})
-		
-	},[])
+		// Loading Logged in user and saving to the persistent reducer storage
+		getCurrentUser({ email: userEmail }).then(
+			(data) => {
+				dispatch({
+					type: 'setUser',
+					data: data,
+				});
+			}
+		);
+	}, []);
+
 	return (
 		<div>
 			<StateContext.Provider
 				value={{ store, dispatch, userEmail }}
 			>
 				<BrowserRouter>
-					<Nav/>
+					<Nav />
 					<h1 className=' my-5 text-center'>
 						Tanda Express
 					</h1>
 					<Switch>
 						<Route exact path='/'>
-							<Redirect to={loggedInUser ? '/dashboard':'/sign-in'} />
+							<Redirect
+								to={
+									loggedInUser
+										? '/dashboard'
+										: '/sign-in'
+								}
+							/>
 						</Route>
 
 						<Route
@@ -81,20 +87,20 @@ function App() {
 						<Route
 							path='/reset-pass/:token'
 							component={ResetPass}
-            ></Route>
-            <Route
+						></Route>
+						<Route
 							path='/dashboard'
 							component={Dashboard}
-            ></Route>
-             <Route
+						></Route>
+						<Route
 							path='/organization/update/:id'
 							component={EditOrganization}
-            ></Route>
-            <Route
+						></Route>
+						<Route
 							path='/organization/show/:id'
 							component={ShowOrganization}
 						></Route>
-            <Route
+						<Route
 							path='/shift/:id'
 							component={Shift}
 						></Route>

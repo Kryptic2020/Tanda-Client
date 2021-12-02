@@ -1,70 +1,107 @@
-# Getting Started with Create React App
+# TANDA CHALLENGE
+This challenge is to create a highly simplified version of the Tanda web app from scratch using Ruby on Rails, Javascript and PostgreSQL.  
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+## Teck Stack
+* Ruby on Rails - backend
+* ReactJs - Frontend 
+* PostgreSQL - database  
 
-In the project directory, you can run:
+---
 
-### `yarn start`
+## Deployment and Hosting
+- Api hosted deployed and Hosted on Heroku
+- Client hosted and deployed on Netlify  
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+---
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## WEBSITE  https://tanda.netlify.app/  
 
-### `yarn test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## REPO Backend API - https://github.com/Kryptic2020/Tanda-API    
+--- 
+## REPO Client - https://github.com/Kryptic2020/Tanda-Client    
+---
 
-### `yarn build`
+## Third party APIs
+* Sendgrid Email API  
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Management tools and Metodology
+* Git & Github with more than 30commits, +8 branchs
+* Agile - short sprints
+* Trello cards 
+![trello](./img/Trello.png)  
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Testing
+* RSPEC 
+* JEST  
 
-### `yarn eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Frameworks, gems and Packages
+* Figaro
+* Bcrypt
+* Knock
+* Bootstrap
+* Styled Component
+* "@date-io/date-fns": "^2.11.0",
+* "@emotion/react": "^11.7.0",
+* "@emotion/styled": "^11.6.0",
+* "@mui/icons-material": "^5.2.0",
+* "@mui/lab": "^5.0.0-alpha.57",
+* "@mui/material": "^5.2.1",
+* "@testing-library/jest-dom": "^5.11.4",
+* "@testing-library/react": "^11.1.0",
+* "@testing-library/user-event": "^12.1.10",
+* "axios": "^0.24.0",
+* "bootstrap": "^5.1.3",
+* "date-fns": "^2.26.0",
+* "react": "^17.0.2",
+* "react-bootstrap": "^2.0.2",
+* "react-datepicker": "^4.3.0",
+* "react-dom": "^17.0.2",
+* "react-router-dom": "^5.2.0",
+* "react-scripts": "4.0.3",
+* "styled-components": "^5.3.3",
+* "web-vitals": "^1.0.1"  
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Tanda Sitemap  
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+![sitemap](./img/Sitemap.png)  
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Tanda ERD  
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+![erd](./img/ERD.png)    
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## Tanda Screen shots  
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+![pics](./img/Signup.png)
+![pics](./img/Login.png)
+![pics](./img/Forgotpass.png)
+![pics](./img/Resetpass.png)
+![pics](./img/UserDetails-Edit.png)  
+![pics](./img/OrganizationDashboard.png)  
+![pics](./img/OrganizationDashboard-Mobile.png)  
+![pics](./img/OrganizationDashboard-Mobile-b.png)  
+![pics](./img/OrganizationShow.png)
+![pics](./img/OrganizationUpdate.png)
+![pics](./img/ShiftsDashboard-Desktop.png)  
+![pics](./img/ShiftsDashboard.png)  
+![pics](./img/ShiftAdd.png)
+![pics](./img/ShiftAdd-Datepicker.png)
+![pics](./img/ShiftAdd-Timepicker.png)  
+![pics](./img/ShiftEdit.png)  
+![pics](./img/Breaks-Add&Remove.png)
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

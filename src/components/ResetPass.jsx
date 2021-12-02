@@ -4,6 +4,7 @@ import { resetPass } from '../services/authServices';
 import { Button, Form } from 'react-bootstrap';
 
 export default function ResetPass() {
+	//State management
 	const initialFormState = {
 		password: '',
 		password_confirmation: '',
@@ -14,6 +15,8 @@ export default function ResetPass() {
 		initialFormState
 	);
 	const { token } = useParams();
+
+	//handle user input
 	function handleChange(event) {
 		setFormState({
 			...formState,
@@ -21,6 +24,8 @@ export default function ResetPass() {
 			msg: '',
 		});
 	}
+
+	//handle submission
 	function handleResetPass(event) {
 		console.log(token);
 		event.preventDefault();
@@ -44,6 +49,9 @@ export default function ResetPass() {
 	}
 	return (
 		<>
+			<h3 className='text-center rounded my-5'>
+				Reset Password
+			</h3>
 			<Form className='container col-11 col-md-9 col-lg-4 bg-light my-5 p-5 rounded'>
 				<Form.Text className='text-danger'>
 					{formState.msg ? formState.msg : null}

@@ -8,6 +8,7 @@ import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
 
 export default function EditOrganization(history) {
+	//State management
 	const { userEmail } = useGlobalState();
 	const initialFormState = {
 		name: '',
@@ -19,6 +20,7 @@ export default function EditOrganization(history) {
 		initialFormState
 	);
 
+	//fetch organization
 	const fetchOrg = () => {
 		showOrg(history.match.params.id).then((data) => {
 			setFormState({
@@ -28,10 +30,13 @@ export default function EditOrganization(history) {
 			});
 		});
 	};
+
+	//Load organization
 	useEffect(() => {
 		fetchOrg();
 	}, []);
 
+	//handle user input
 	function handleChange(event) {
 		setFormState({
 			...formState,
@@ -39,6 +44,7 @@ export default function EditOrganization(history) {
 		});
 	}
 
+	// handle organization update
 	function handleUpdate() {
 		updateOrg(formState)
 			.then(() => {
@@ -46,6 +52,8 @@ export default function EditOrganization(history) {
 			})
 			.catch((error) => console.log(error));
 	}
+
+	//Delete organization
 	function handleDelete() {
 		destroyOrg(formState.org_id)
 			.then(() => {

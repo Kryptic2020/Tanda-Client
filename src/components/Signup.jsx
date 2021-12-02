@@ -8,6 +8,7 @@ import { Button, Form } from 'react-bootstrap';
 import { pattern } from '../utils/authValidation';
 
 export default function Signup() {
+	//State management
 	const initialFormState = {
 		username: '',
 		email: '',
@@ -23,6 +24,8 @@ export default function Signup() {
 	const [visible, setVisible] = useState(false);
 	const { dispatch } = useGlobalState();
 	let history = useHistory();
+
+	//handle user input
 	function handleChange(event) {
 		setFormState({
 			...formState,
@@ -31,6 +34,7 @@ export default function Signup() {
 			errors: '',
 		});
 	}
+	//handle user registration submission
 	function handleRegister(event) {
 		const isValid = pattern.test(formState.email);
 		if (isValid) {
@@ -130,7 +134,7 @@ export default function Signup() {
 				>
 					<Form.Label>Password</Form.Label>
 					<Form.Control
-						type={visible ? 'text':'password'}
+						type={visible ? 'text' : 'password'}
 						placeholder='Password'
 						name='password'
 						value={formState.password}
@@ -148,14 +152,15 @@ export default function Signup() {
 						Password Confirmation
 					</Form.Label>
 					<Form.Control
-						type={visible ? 'text':'password'}
+						type={visible ? 'text' : 'password'}
 						placeholder='Password Confirmation'
 						name='password_confirmation'
 						value={
 							formState.password_confirmation
 						}
 						onChange={handleChange}
-					/><span class='s-viewer'>
+					/>
+					<span class='s-viewer'>
 						{visible ? (
 							<VisibilityIcon
 								className=' w-100'
