@@ -7,9 +7,13 @@ import {
 	Tooltip,
 	OverlayTrigger,
 } from 'react-bootstrap';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import Switch from '@mui/material/Switch';
 import { useGlobalState } from '../utils/stateContext';
 import {
-	shifts,
+	activeShifts, inactiveShifts,
 	deleteShift,
 } from '../services/shiftServices';
 import { showOrg } from '../services/organizationServices';
@@ -23,10 +27,11 @@ import BreakForm from './BreakForm';
 export default function Shift(history) {
 	//State management
 	const { store } = useGlobalState();
-	const { current_user } = store;
+	const { user_id } = store;
 	const [shiftsState, setShiftsState] = useState([{}]);
 	const [shiftState, setShiftState] = useState({});
 	const [orgState, setOrgState] = useState({});
+	const [active, setActive] = useState(true);
 	const [showModalCreate, setShowModalCreate] =
 		useState(false);
 	const [showModalUpdate, setShowModalUpdate] =
@@ -43,9 +48,17 @@ export default function Shift(history) {
 
 	//fetch shifts
 	const set_table = () => {
-		shifts(org_id).then((data) => {
+		if (active) {
+	activeShifts(org_id).then((data) => {
 			setShiftsState(data);
 		});
+		} else {
+				inactiveShifts(org_id).then((data) => {
+			setShiftsState(data);
+		});
+
+		}
+	
 		showOrg(org_id).then((data) => {
 			setOrgState(data);
 		});
@@ -72,12 +85,79 @@ export default function Shift(history) {
 
 	//work hours calculations
 	function getWorkedHours(start, finish, coffee) {
+		let day = 0;
+		if (finish < start) { day = 1000 * 60 * 60 * 24}
 		const end =
-			new Date(finish).getTime() / (1000 * 60);
+			(new Date(finish).getTime()+ day) / (1000 * 60);
 		const init =
 			new Date(start).getTime() / (1000 * 60);
 		const result = end - init - sumBreak(coffee);
 		return (Math.round(result) / 60).toFixed(2);
+	}
+
+		//calculate overnight shift
+	function getOvernight(start, finish, coffee) {
+		let day = 1000 * 60 * 60 * 24;
+		let result = 0;
+		if (finish < start) {
+			const end =
+			(new Date(finish).getTime()+ day) / (1000 * 60);
+		const init =
+			new Date(start).getTime() / (1000 * 60);
+		result = (Math.round(end - init - sumBreak(coffee)) / 60).toFixed(2);
+		}		
+		return result	
+	}
+
+	//calculate sunday overtime
+	function penaltyTimeCalc(start) {
+		const time = new Date(start).getMinutes() + new Date(start).getHours() * 60		
+		const day = 60 * 24		
+		return day - time
+	}
+
+ //check if date is sunday
+	function isSunday(date) {
+		if (new Date(date).getDay() === 0) {
+				return true
+		} else {
+			return false
+		}
+	}
+	function isSaturday(date) {
+		if (new Date(date).getDay() === 6) {
+			return true; 
+		} else {
+			return false
+		}
+	}
+
+	//calculate shift cost
+	function shiftCost(date, start, finish, coffee, rate) {
+		let cost = 0;
+		if (isSunday(date)) {
+			if (getOvernight(start, finish, coffee) === 0) {
+				cost = getWorkedHours(start, finish, coffee)*rate*2
+			} else {
+				const regular = getOvernight(start, finish, coffee) - penaltyTimeCalc(start);
+				if (regular < 0) {
+					cost = (penaltyTimeCalc(start) - regular) * rate *2
+				} else {cost = (penaltyTimeCalc(start)*2 + regular) * rate}			
+			}
+		} else if (isSaturday(date)) {
+			if (getOvernight(start, finish, coffee) === 0) {
+				cost = getWorkedHours(start, finish, coffee)*rate
+			} else {
+				const regular = getOvernight(start, finish, coffee) - penaltyTimeCalc(start);
+				if (regular < 0) {
+					cost = (penaltyTimeCalc(start) - regular) * rate
+				} else {
+					cost = (penaltyTimeCalc(start) + (regular *2)) * rate
+				}
+			}
+			
+		} else {cost = getWorkedHours(start, finish, coffee)*rate}
+		return cost
 	}
 
 	//Modal shift form - add new shift
@@ -194,14 +274,62 @@ export default function Shift(history) {
 	function handleDelete(id) {
 		deleteShift(id).then((data) => {
 			set_table();
-			console.log(data);
 		});
 	}
+
+	//handle active/inactive employee shifts display
+	function handleSwitchChange(e) {
+		if (e.target.checked === true) { setActive(true); } else { setActive(false); };
+	}
+
+ //Switch styling
+	const AntSwitch = styled(Switch)(({ theme }) => ({
+  width: 56,
+  height: 32,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 30,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(18px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 4,
+    '&.Mui-checked': {
+      transform: 'translateX(24px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.mode === 'dark' ? '#177ddc' : '#1890ff',
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    transition: theme.transitions.create(['width'], {
+      duration: 300,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 32 / 2,
+    opacity: 1,
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));
+
 
 	//Load shifts
 	useEffect(() => {
 		set_table();
-	}, []);
+	}, [active]);
 
 	return (
 		<>
@@ -209,6 +337,14 @@ export default function Shift(history) {
 				<h2 className='my-5 text-center'>
 					{orgState.name}
 				</h2>
+				<div className=" col mx-auto my-3 p-3 bg-light text-center d-flex flex-column">
+				<h5>Which employees should be displayed?</h5>
+				 <Stack className="col col-md-4 col-lg-4 m-auto my-3" direction="row" spacing={1} alignItems="center">
+        <Typography>Inactive only</Typography>
+        <AntSwitch onChange={handleSwitchChange} checked={active} inputProps={{ 'aria-label': 'ant design' }} />
+        <Typography>Active Only</Typography>
+					</Stack>
+				</div>
 				{modalUpdateShift}
 				{modalCreateShift}
 				{modalUpdateBreak}
@@ -237,7 +373,7 @@ export default function Shift(history) {
 					</Link>
 				</div>
 				<Table
-					className='my-2'
+					className='mt-3 mb-5'
 					responsive
 					striped
 					bordered
@@ -284,7 +420,7 @@ export default function Shift(history) {
 										{sumBreak(el.break)}
 									</td>
 									<td>
-										{current_user.id ===
+										{user_id && Number(user_id) ===
 										el.user_id ? (
 											<AddCircleIcon
 												className='text-secondary'
@@ -303,15 +439,17 @@ export default function Shift(history) {
 											el.break
 										)}
 									</td>
-									<td>0</td>
+									<td>{getOvernight(el.start,
+											el.finish,
+											el.break)}</td>
 									<td>
 										{(
-											getWorkedHours(
+											shiftCost(
+												el.date,
 												el.start,
 												el.finish,
-												el.break
-											) *
-											orgState.hourly_rate
+												el.break,											
+											orgState.hourly_rate)
 										).toLocaleString(
 											'en-US',
 											{
@@ -322,7 +460,7 @@ export default function Shift(history) {
 										)}
 									</td>
 									<td>
-										{current_user.id ===
+										{user_id && Number(user_id) ===
 										el.user_id ? (
 											<CreateIcon
 												className='text-secondary'
@@ -335,7 +473,7 @@ export default function Shift(history) {
 										) : null}
 									</td>
 									<td>
-										{current_user.id ===
+										{user_id && Number(user_id) ===
 										el.user_id ? (
 											<DeleteIcon
 												className='text-secondary'

@@ -8,17 +8,12 @@ export async function signIn(data) {
 	const response = await tandaAPI.post('/api/auth/sign-in', data)
 	return response.data
 }
-export async function getCurrentUser(data) {
-	const response = await tandaAPI.post('/api/auth/current-user', data)
-	return response.data
-}
 export async function signOut() {
 	sessionStorage.clear();
 	return "Logged out"
 }
 export async function forgotPass(data) {
 	const response = await tandaAPI.post('/api/auth/forgot-pass', data)
-	console.log(response.data)
 	return response.data
 }
 export async function resetPass(data) {
@@ -27,8 +22,6 @@ export async function resetPass(data) {
 }
 
 export async function updateUser(data) {
-	console.log(data);
 	const response = await tandaAPI.put('/api/auth/update', data)
-	console.log(response.data);
 	return response.data
 }

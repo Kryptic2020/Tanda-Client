@@ -39,7 +39,7 @@ export default function ShiftForm({
 			dateState: new Date(),
 			startTimeState: null,
 			finishTimeState: null,
-			breakState: null,
+			breakState: '',
 		};
 	}
 	const [formState, setFormState] = useState(

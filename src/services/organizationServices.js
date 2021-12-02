@@ -11,9 +11,7 @@ export async function getOrgs() {
 }
 
 export async function getJoinedOrgs(data) {
-	//console.log(data)
-	const response = await tandaAPI.post('/api/organization/joined', data)	
-	//console.log(response.data)
+	const response = await tandaAPI.post('/api/organization/joined', data)
 	return response.data
 }
 
@@ -33,7 +31,6 @@ export async function destroyOrg(data) {
 }
 
 export async function joinOrg(data) {
-	console.log(data)
 	const response = await tandaAPI.post('/api/organization/join', data)	
 	return response.data
 }

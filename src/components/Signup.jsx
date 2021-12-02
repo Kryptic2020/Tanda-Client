@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { signUp } from '../services/authServices';
+import {
+	signUp
+} from '../services/authServices';
 import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
 import { pattern } from '../utils/authValidation';
@@ -50,10 +52,13 @@ export default function Signup() {
 							errors: data.errors,
 						});
 					} else {
-						console.log(data);
 						sessionStorage.setItem(
 							'token',
 							data.jwt
+						);
+						sessionStorage.setItem(
+							'userId',
+							data.user_id
 						);
 						sessionStorage.setItem(
 							'user',

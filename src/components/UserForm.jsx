@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button, Form } from 'react-bootstrap';
-import { getCurrentUser } from '../services/authServices';
 import { useGlobalState } from '../utils/stateContext';
 import { updateUser } from '../services/authServices';
 import { pattern } from '../utils/authValidation';
@@ -10,12 +9,12 @@ import { pattern } from '../utils/authValidation';
 export default function UserForm() {
 	//State management
 	const { store } = useGlobalState();
-	const { current_user, userEmail } = store;
+	const { user_id,loggedInUser, userEmail } = store;
 	const initialFormState = {
-		username: current_user.username,
-		email: current_user.email,
+		username: loggedInUser,
+		email: userEmail,
 		password: '',
-		id: current_user.id,
+		user_id: user_id,
 		email_error: '',
 		msg: '',
 	};
@@ -54,18 +53,6 @@ export default function UserForm() {
 	}
 
 	// Loads user details
-	useEffect(() => {
-		getCurrentUser({ email: userEmail }).then(
-			(data) => {
-				setFormState({
-					...formState,
-					username: data.username,
-					email: data.email,
-					id: data.id,
-				});
-			}
-		);
-	}, []);
 
 	return (
 		<>
