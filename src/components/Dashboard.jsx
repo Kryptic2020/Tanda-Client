@@ -68,7 +68,6 @@ export default function Dashboard() {
 			};
 			joinOrg(data)
 				.then((data) => {
-					console.log(data);
 					fetchJoinedOrgs();
 				})
 				.catch((error) => console.log(error));
@@ -105,9 +104,10 @@ export default function Dashboard() {
 					{msgState && msgState}
 				</h5>
 				<h3 className='m-4'>Organization list</h3>
+				<ul>
 				{orgState &&
 					orgState.map((org, index) => (
-						<ul>
+						
 							<li
 								key={index}
 								className='d-flex justify-content-between'
@@ -139,14 +139,15 @@ export default function Dashboard() {
 									</Button>
 								</div>
 							</li>
-						</ul>
-					))}
+					
+					))}	</ul>
 			</section>
 			<section className='container col-11 col-md-9 col-lg-4 bg-light my-2 py-5 px-4 rounded'>
 				<h3 className='m-4'>Joined list</h3>
+				<ul>
 				{joinedOrgState &&
 					joinedOrgState.map((org, index) => (
-						<ul>
+						
 							<li
 								key={index}
 								className='d-flex justify-content-between'
@@ -165,8 +166,8 @@ export default function Dashboard() {
 									</Button>
 								</Link>
 							</li>
-						</ul>
-					))}
+					
+					))}	</ul>
 			</section>
 
 			<section className='container col-11 col-md-9 col-lg-3 bg-light my-2 py-5 px-4 rounded'>

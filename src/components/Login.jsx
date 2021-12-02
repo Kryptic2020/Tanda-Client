@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { signIn } from '../services/authServices';
+import {
+	signIn
+} from '../services/authServices';
 import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
 
@@ -33,14 +35,14 @@ export default function SignIn({ history }) {
 	function handleSubmit(event) {
 		event.preventDefault();
 		signIn(formState)
-			.then(({ username, jwt, errors }) => {
+			.then(({ username, jwt, errors, user_id }) => {
 				if (errors) {
 					setFormState({
 						...formState,
 						errors: errors,
 					});
-				} else {
-					console.log(username, jwt, errors);
+				} else {					
+          sessionStorage.setItem('userId', user_id);
 					sessionStorage.setItem('token', jwt);
 					sessionStorage.setItem(
 						'user',

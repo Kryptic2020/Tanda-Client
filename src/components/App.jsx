@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer } from 'react';
 import stateReducer from '../utils/stateReducer';
 import { StateContext } from '../utils/stateContext';
 import {
@@ -19,12 +19,11 @@ import Dashboard from './Dashboard';
 import EditOrganization from './EditOrganization';
 import ShowOrganization from './ShowOrganization';
 import Shift from './Shift';
-import { getCurrentUser } from '../services/authServices';
 
 function App() {
 	//State management
 	const initialState = {
-		current_user: {},
+		user_id: sessionStorage.getItem('userId') || null,
 		userEmail: sessionStorage.getItem('email') || null,
 		loggedInUser:
 			sessionStorage.getItem('user') || null,
@@ -38,18 +37,6 @@ function App() {
 	);
 
 	const { loggedInUser, userEmail } = store;
-
-	useEffect(() => {
-		// Loading Logged in user and saving to the persistent reducer storage
-		getCurrentUser({ email: userEmail }).then(
-			(data) => {
-				dispatch({
-					type: 'setUser',
-					data: data,
-				});
-			}
-		);
-	}, []);
 
 	return (
 		<div>

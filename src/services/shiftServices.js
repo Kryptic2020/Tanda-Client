@@ -1,7 +1,11 @@
 import tandaAPI from '../config/tanda_api'
 
-export async function shifts(data) {
-  const response = await tandaAPI.get(`/api/shift/${data}`)
+export async function activeShifts(data) {
+  const response = await tandaAPI.get(`/api/shift/active/${data}`)
+	return response.data
+}
+export async function inactiveShifts(data) {
+  const response = await tandaAPI.get(`/api/shift/inactive/${data}`)
 	return response.data
 }
 

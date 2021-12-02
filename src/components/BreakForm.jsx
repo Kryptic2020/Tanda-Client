@@ -9,7 +9,7 @@ import {
 export default function BreakForm({ shift, close_modal }) {
 	
 	//State management
-	const [breakState, setBreakState] = useState(null);
+	const [breakState, setBreakState] = useState();
 	const [shiftState, setShiftState] = useState({});
 
   // Delete a single break value
@@ -22,7 +22,6 @@ export default function BreakForm({ shift, close_modal }) {
 		}).then(() => {
 			showShift(shiftState.id).then((data) => {
 				setShiftState(data);
-				console.log(data.break);
 			});
 		});
 	};
@@ -41,7 +40,7 @@ export default function BreakForm({ shift, close_modal }) {
 			shift_id: shiftState.id,
 			break: breakArray,
 		}).then(() => {
-			setBreakState(null);
+			setBreakState();
 			showShift(shiftState.id).then((data) => {
 				setShiftState(data);
 				console.log(data.break);
@@ -68,7 +67,7 @@ export default function BreakForm({ shift, close_modal }) {
 				{shiftState.break &&
 					shiftState.break.map((el, index) => (
 						<div key={index} className='row col-9 col-md-9 col-lg-8 p-0 my-2 mx-auto'><li>
-							<input
+							<input readOnly
 								className='p-2 my-2 w-75 rounded'
 								value={el}
 							/>
@@ -84,7 +83,7 @@ export default function BreakForm({ shift, close_modal }) {
 					))}
 				</ol>
 				<div className='row col-8 col-md-9 col-lg-8 p-0 my-4 mx-auto d-flex'>
-			<input value={breakState} className="p-2 my-0 mx-0 col-5 rounded" type='number' onChange={handleChange} />
+			<input defaultValue={breakState} className="p-2 my-0 mx-0 col-5 rounded" type='number' onChange={handleChange} />
 			<Button
 				className='col h-100 btn btn-sm my-auto mx-4'
 						onClick={handleSubmit}
@@ -95,7 +94,7 @@ export default function BreakForm({ shift, close_modal }) {
 				</div>
       <div className='row col-8 col-md-9 col-lg-8 p-0 my-1 mx-auto d-flex'>
       <Button variant="secondary w-100 mx-auto"
-				className='btn btn-sm m-3'
+				className='btn btn-sm m-3 p-2'
 				onClick={close_modal}
 			>
 				Close
