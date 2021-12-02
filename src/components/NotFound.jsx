@@ -5,7 +5,7 @@ const NotFound =()=>{
     return(
         <div>
             <p> 404 Error</p>
-            <Link to ="messages">click here to go to homepage</Link>
+            <Link to ="/">click here to go to homepage</Link>
         </div>
     )
 }

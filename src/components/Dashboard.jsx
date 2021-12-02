@@ -10,15 +10,14 @@ import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
 
 export default function Dashboard() {
+	//State management
 	const { userEmail } = useGlobalState();
-
 	const initialFormState = {
 		name: '',
 		hourly_rate: '',
 		user_email: userEmail,
 		org_id: '',
 	};
-
 	const [formState, setFormState] = useState(
 		initialFormState
 	);
@@ -28,18 +27,21 @@ export default function Dashboard() {
 	);
 	const [msgState, setMsgState] = useState();
 
+	// fetch all organizations from database
 	function fetchOrgs() {
 		getOrgs().then((data) => {
 			setOrgState(data);
 		});
 	}
 
+	// fetch only joined organizations from database
 	function fetchJoinedOrgs() {
 		getJoinedOrgs(formState).then((data) => {
 			setjoinedOrgState(data);
 		});
 	}
 
+	// handle user inputs
 	function handleChange(event) {
 		setFormState({
 			...formState,
@@ -47,6 +49,7 @@ export default function Dashboard() {
 		});
 	}
 
+	// handle join organization request
 	function handleJoin(id) {
 		const joined = joinedOrgState.find(
 			(el) => el.id === id
@@ -72,6 +75,7 @@ export default function Dashboard() {
 		}
 	}
 
+	// create a new organzation into database
 	function handleSubmit(event) {
 		event.preventDefault();
 		newOrg(formState)
@@ -88,6 +92,7 @@ export default function Dashboard() {
 			.catch((error) => console.log(error));
 	}
 
+	// Load organizations and joined organizations
 	useEffect(() => {
 		fetchOrgs();
 		fetchJoinedOrgs();

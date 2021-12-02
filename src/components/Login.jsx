@@ -7,6 +7,7 @@ import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
 
 export default function SignIn({ history }) {
+	//State management
 	const initialFormState = {
 		email: '',
 		password: '',
@@ -17,6 +18,8 @@ export default function SignIn({ history }) {
 	);
 	const [visible, setVisible] = useState(false);
 	const { dispatch } = useGlobalState();
+
+	//handle user input
 	function handleChange(event) {
 		setFormState({
 			...formState,
@@ -25,6 +28,8 @@ export default function SignIn({ history }) {
 			errors: '',
 		});
 	}
+
+	//handle submission
 	function handleSubmit(event) {
 		event.preventDefault();
 		signIn(formState)
@@ -93,12 +98,13 @@ export default function SignIn({ history }) {
 				>
 					<Form.Label>Password</Form.Label>
 					<Form.Control
-						type={visible ? 'text':'password'}
+						type={visible ? 'text' : 'password'}
 						placeholder='Password'
 						name='password'
 						value={formState.password}
 						onChange={handleChange}
-					/><span class='l-viewer'>
+					/>
+					<span class='l-viewer'>
 						{visible ? (
 							<VisibilityIcon
 								className=' w-100'

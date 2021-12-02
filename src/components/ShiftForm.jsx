@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -11,7 +11,6 @@ import {
 	newShift,
 	updateShift,
 } from '../services/shiftServices';
-//import { showOrg } from '../services/organizationServices';
 
 export default function ShiftForm({
 	shift,
@@ -19,11 +18,10 @@ export default function ShiftForm({
 	org_id,
 	set_table,
 }) {
+	//State management
 	const { store } = useGlobalState();
 	const { loggedInUser, userEmail } = store;
-
 	let initialFormState = {};
-
 	if (shift) {
 		initialFormState = {
 			username: loggedInUser,
@@ -44,11 +42,11 @@ export default function ShiftForm({
 			breakState: null,
 		};
 	}
-
 	const [formState, setFormState] = useState(
 		initialFormState
 	);
 
+	//handle user input
 	function handleChange(key, value) {
 		setFormState({
 			...formState,
@@ -56,6 +54,7 @@ export default function ShiftForm({
 		});
 	}
 
+	//handle update / create shift submission
 	function handleSubmit() {
 		const formData = {
 			user_email: userEmail,
@@ -148,21 +147,22 @@ export default function ShiftForm({
 						/>
 					</div>
 
-					<div className='row col-10 col-lg-2 p-0 my-2 mx-auto'>
-						{' '}
-						<input
-							type='number'
-							value={formState.breakState}
-							className='bg-light border height'
-							placeholder='Enter Break (minutes only)'
-							onChange={(data) =>
-								handleChange(
-									'breakState',
-									data.target.value
-								)
-							}
-						></input>
-					</div>
+					{shift ? null : (
+						<div className='row col-10 col-lg-2 p-0 my-2 mx-auto'>
+							<input
+								type='number'
+								value={formState.breakState}
+								className='bg-light border height'
+								placeholder='Enter Break (minutes only)'
+								onChange={(data) =>
+									handleChange(
+										'breakState',
+										data.target.value
+									)
+								}
+							></input>
+						</div>
+					)}
 					<Button
 						className='btn btn-lg col-10 col-lg-1 my-5 my-lg-2 mx-auto b-height row'
 						disabled={

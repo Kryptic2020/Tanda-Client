@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button, Form } from 'react-bootstrap';
@@ -9,24 +8,23 @@ import { updateUser } from '../services/authServices';
 import { pattern } from '../utils/authValidation';
 
 export default function UserForm() {
+	//State management
 	const { store } = useGlobalState();
 	const { current_user, userEmail } = store;
-	let history = useHistory();
-
 	const initialFormState = {
 		username: current_user.username,
 		email: current_user.email,
-    password: '',
-    id:current_user.id,
-    email_error: '',
-    msg:''
+		password: '',
+		id: current_user.id,
+		email_error: '',
+		msg: '',
 	};
 	const [formState, setFormState] = useState(
 		initialFormState
 	);
-
 	const [visible, setVisible] = useState(false);
 
+	//handle user input
 	function handleChange(e) {
 		setFormState({
 			...formState,
@@ -34,15 +32,17 @@ export default function UserForm() {
 			email_error: '',
 		});
 	}
+
+	//handle user details update submission
 	function handleSubmit() {
 		const isValid = pattern.test(formState.email);
 		if (isValid) {
 			updateUser(formState)
 				.then((data) => {
 					setFormState({
-				...formState,
-				msg: data.msg,
-			});
+						...formState,
+						msg: data.msg,
+					});
 				})
 				.catch((error) => console.log(error));
 		} else {
@@ -53,14 +53,15 @@ export default function UserForm() {
 		}
 	}
 
+	// Loads user details
 	useEffect(() => {
 		getCurrentUser({ email: userEmail }).then(
 			(data) => {
 				setFormState({
 					...formState,
 					username: data.username,
-          email: data.email,
-          id:data.id
+					email: data.email,
+					id: data.id,
 				});
 			}
 		);
@@ -71,14 +72,19 @@ export default function UserForm() {
 			<h3 className='text-center rounded pb-5 m-0'>
 				Change Details
 			</h3>
-
 			<div className='rounded mb-5 mx-auto py-5  d-flex flex-wrap col-12 col-lg-6 bg-light text-center row'>
 				<div className='row col-10 p-0 my-2 mx-auto'>
-					<Form.Text className={formState.msg ?'text-success m-0 p-0':'text-danger m-0 p-0'}>
+					<Form.Text
+						className={
+							formState.msg
+								? 'text-success m-0 p-0'
+								: 'text-danger m-0 p-0'
+						}
+					>
 						{formState.email_error
 							? formState.email_error
-              : null}
-            {formState.msg
+							: null}
+						{formState.msg
 							? formState.msg
 							: null}
 					</Form.Text>
