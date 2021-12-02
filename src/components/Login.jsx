@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { signIn } from '../services/authServices';
 import { useGlobalState } from '../utils/stateContext';
 import { Button, Form } from 'react-bootstrap';
@@ -13,6 +15,7 @@ export default function SignIn({ history }) {
 	const [formState, setFormState] = useState(
 		initialFormState
 	);
+	const [visible, setVisible] = useState(false);
 	const { dispatch } = useGlobalState();
 	function handleChange(event) {
 		setFormState({
@@ -90,12 +93,28 @@ export default function SignIn({ history }) {
 				>
 					<Form.Label>Password</Form.Label>
 					<Form.Control
-						type='password'
+						type={visible ? 'text':'password'}
 						placeholder='Password'
 						name='password'
 						value={formState.password}
 						onChange={handleChange}
-					/>
+					/><span class='l-viewer'>
+						{visible ? (
+							<VisibilityIcon
+								className=' w-100'
+								onClick={() =>
+									setVisible(false)
+								}
+							/>
+						) : (
+							<VisibilityOffIcon
+								className='w-100 '
+								onClick={() =>
+									setVisible(true)
+								}
+							/>
+						)}
+					</span>
 				</Form.Group>
 				<Link className='mt-5' to='/forgot-pass'>
 					Forgot password ?

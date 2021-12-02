@@ -1,17 +1,20 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import {
 	Navbar,
 	Container,
 	Nav,
-	Button,
+	Button, Modal
 } from 'react-bootstrap';
+import CreateIcon from '@mui/icons-material/Create';
 import { useGlobalState } from '../utils/stateContext';
 import { signOut } from '../services/authServices';
+import UserForm from './UserForm';
 
 const NavigationBar = ({ history }) => {
 	const { store, dispatch } = useGlobalState();
 	const { loggedInUser } = store;
+	const[show, setShow] = useState(false)
 
 	function handleSignOut(event) {
 		event.preventDefault();
@@ -24,6 +27,20 @@ const NavigationBar = ({ history }) => {
 			history.push('/');
 		});
 	}
+
+	function handleModal() {
+		setShow(true)
+	}
+
+	const ModalUserForm = (
+		<Modal fullscreen={true} show={show} onHide={()=>{setShow(false)}} animation={false}>
+	    <Modal.Header className="bg-light" closeButton>
+	    </Modal.Header>
+		  <Modal.Body >
+			  <UserForm />
+		  </Modal.Body>
+		</Modal>
+	)
 	return (
 		<>
 			<Navbar
@@ -34,7 +51,7 @@ const NavigationBar = ({ history }) => {
 			>
 				<Container>
 					<Navbar.Brand href='#home'>
-						{loggedInUser}
+						{loggedInUser} {loggedInUser ? <CreateIcon className="mx-3" onClick={handleModal} /> : null}
 					</Navbar.Brand>
 					<Nav className='justify-content-end'>
 						{loggedInUser ? (
@@ -59,7 +76,7 @@ const NavigationBar = ({ history }) => {
 						)}
 					</Nav>
 				</Container>
-			</Navbar>
+			</Navbar>{ModalUserForm}
 		</>
 	);
 };
