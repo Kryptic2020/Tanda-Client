@@ -165,7 +165,7 @@ export default function Signup() {
 						}
 						onChange={handleChange}
 					/>
-					<span class='s-viewer'>
+					<span className='s-viewer'>
 						{visible ? (
 							<VisibilityIcon
 								className=' w-100'

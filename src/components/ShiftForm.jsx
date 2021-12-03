@@ -59,7 +59,7 @@ export default function ShiftForm({
 		const formData = {
 			user_email: userEmail,
 			org_id,
-			date: formState.dateState,
+			date: new Date(formState.dateState.toDateString()),
 			start_time: formState.startTimeState,
 			finish_time: formState.finishTimeState,
 			break: formState.breakState,

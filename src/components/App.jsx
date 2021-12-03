@@ -7,7 +7,7 @@ import {
 	Switch,
 	Redirect,
 } from 'react-router-dom';
-import NotFound from './NotFound';
+//import NotFound from './NotFound';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Nav from './NavigationBar';
@@ -60,39 +60,55 @@ function App() {
 						</Route>
 
 						<Route
+							exact
 							path='/sign-in'
 							component={Login}
 						></Route>
 						<Route
+							exact
 							path='/sign-up'
 							component={Signup}
 						></Route>
 						<Route
+							exact
 							path='/forgot-pass'
 							component={ForgotPass}
 						></Route>
 						<Route
+							exact
 							path='/reset-pass/:token'
 							component={ResetPass}
 						></Route>
-						<Route
-							path='/dashboard'
-							component={Dashboard}
-						></Route>
-						<Route
-							path='/organization/update/:id'
-							component={EditOrganization}
-						></Route>
-						<Route
-							path='/organization/show/:id'
-							component={ShowOrganization}
-						></Route>
-						<Route
-							path='/shift/:id'
-							component={Shift}
-						></Route>
+						{loggedInUser ? (
+							<Route
+								exact
+								path='/dashboard'
+								component={Dashboard}
+							></Route>
+						) : null}
+						{loggedInUser ? (
+							<Route
+								exact
+								path='/organization/update/:id'
+								component={EditOrganization}
+							></Route>
+						) : null}
+						{loggedInUser ? (
+							<Route
+								exact
+								path='/organization/show/:id'
+								component={ShowOrganization}
+							></Route>
+						) : null}
+						{loggedInUser ? (
+							<Route
+								exact
+								path='/shift/:id'
+								component={Shift}
+							></Route>
+						) : null}
 
-						<Route component={NotFound} />
+						{/* <Route component={NotFound} /> */}
 					</Switch>
 				</BrowserRouter>
 			</StateContext.Provider>

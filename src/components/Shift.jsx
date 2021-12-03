@@ -5,6 +5,7 @@ import {
 	Modal,
 	Button,
 	Tooltip,
+	Form,
 	OverlayTrigger,
 } from 'react-bootstrap';
 import Stack from '@mui/material/Stack';
@@ -13,7 +14,7 @@ import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import { useGlobalState } from '../utils/stateContext';
 import {
-	activeShifts, inactiveShifts,
+	getShifts,
 	deleteShift,
 } from '../services/shiftServices';
 import { showOrg } from '../services/organizationServices';
@@ -23,15 +24,21 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShiftForm from './ShiftForm';
 import BreakForm from './BreakForm';
+import Datepicker from './Datepicker';
+import { convertTime, convertDate, getWorkedHours, getOvernight, sumBreak, shiftCost, table_heading } from '../utils/shiftFunctions';
+import Loading from '../ui/Spinner/Loading';
 
 export default function Shift(history) {
 	//State management
 	const { store } = useGlobalState();
 	const { user_id } = store;
-	const [shiftsState, setShiftsState] = useState([{}]);
+	const [shiftsState, setShiftsState] = useState([]);
 	const [shiftState, setShiftState] = useState({});
 	const [orgState, setOrgState] = useState({});
 	const [active, setActive] = useState(true);
+	const [isLoading, setIsLoading] = useState(true);
+	const [date, setDate] = useState();
+	const [searchEmployeeState,setSearchEmployeeState] = useState('')
 	const [showModalCreate, setShowModalCreate] =
 		useState(false);
 	const [showModalUpdate, setShowModalUpdate] =
@@ -46,119 +53,23 @@ export default function Shift(history) {
 	};
 	const org_id = history.match.params.id;
 
+	const parentCallback = (data) => {
+		setDate(data);
+	}
+
 	//fetch shifts
 	const set_table = () => {
-		if (active) {
-	activeShifts(org_id).then((data) => {
+		//var newDate = new Date(oldDate.toDateString());
+		let date_utc = null;
+		if (date) { date_utc = new Date(date.toDateString()); }
+		getShifts({ org_id,date:date_utc,active }).then((data) => {
 			setShiftsState(data);
-		});
-		} else {
-				inactiveShifts(org_id).then((data) => {
-			setShiftsState(data);
-		});
-
-		}
-	
+			setIsLoading(false);
+		});	
 		showOrg(org_id).then((data) => {
 			setOrgState(data);
 		});
 	};
-
-	//convert date formats
-	function convertDate(date) {
-		return new Date(date).toLocaleDateString('es-ES', {
-			year: 'numeric',
-			month: 'numeric',
-			day: 'numeric',
-		});
-	}
-
-	//convert time formats
-	function convertTime(data) {
-		let time =
-			new Date(data).getHours() +
-			':' +
-			((new Date(data).getMinutes() < 10 ? '0' : '') +
-				new Date(data).getMinutes());
-		return time;
-	}
-
-	//work hours calculations
-	function getWorkedHours(start, finish, coffee) {
-		let day = 0;
-		if (finish < start) { day = 1000 * 60 * 60 * 24}
-		const end =
-			(new Date(finish).getTime()+ day) / (1000 * 60);
-		const init =
-			new Date(start).getTime() / (1000 * 60);
-		const result = end - init - sumBreak(coffee);
-		return (Math.round(result) / 60).toFixed(2);
-	}
-
-		//calculate overnight shift
-	function getOvernight(start, finish, coffee) {
-		let day = 1000 * 60 * 60 * 24;
-		let result = 0;
-		if (finish < start) {
-			const end =
-			(new Date(finish).getTime()+ day) / (1000 * 60);
-		const init =
-			new Date(start).getTime() / (1000 * 60);
-		result = (Math.round(end - init - sumBreak(coffee)) / 60).toFixed(2);
-		}		
-		return result	
-	}
-
-	//calculate sunday overtime
-	function penaltyTimeCalc(start) {
-		const time = new Date(start).getMinutes() + new Date(start).getHours() * 60		
-		const day = 60 * 24		
-		return day - time
-	}
-
- //check if date is sunday
-	function isSunday(date) {
-		if (new Date(date).getDay() === 0) {
-				return true
-		} else {
-			return false
-		}
-	}
-	function isSaturday(date) {
-		if (new Date(date).getDay() === 6) {
-			return true; 
-		} else {
-			return false
-		}
-	}
-
-	//calculate shift cost
-	function shiftCost(date, start, finish, coffee, rate) {
-		let cost = 0;
-		if (isSunday(date)) {
-			if (getOvernight(start, finish, coffee) === 0) {
-				cost = getWorkedHours(start, finish, coffee)*rate*2
-			} else {
-				const regular = getOvernight(start, finish, coffee) - penaltyTimeCalc(start);
-				if (regular < 0) {
-					cost = (penaltyTimeCalc(start) - regular) * rate *2
-				} else {cost = (penaltyTimeCalc(start)*2 + regular) * rate}			
-			}
-		} else if (isSaturday(date)) {
-			if (getOvernight(start, finish, coffee) === 0) {
-				cost = getWorkedHours(start, finish, coffee)*rate
-			} else {
-				const regular = getOvernight(start, finish, coffee) - penaltyTimeCalc(start);
-				if (regular < 0) {
-					cost = (penaltyTimeCalc(start) - regular) * rate
-				} else {
-					cost = (penaltyTimeCalc(start) + (regular *2)) * rate
-				}
-			}
-			
-		} else {cost = getWorkedHours(start, finish, coffee)*rate}
-		return cost
-	}
 
 	//Modal shift form - add new shift
 	const modalCreateShift = (
@@ -224,32 +135,6 @@ export default function Shift(history) {
 			</Modal.Body>
 		</Modal>
 	);
-
-	//shift table headings
-	const table_heading = [
-		'Employee name',
-		'Shift date',
-		'Start time',
-		'Finish time',
-		'Break length (minutes)',
-		'Add/ Remove Breaks',
-		'Hours worked',
-		'Overnigth hours',
-		'Shift cost',
-		'Edit',
-		'Delete',
-	];
-
-	// sum break array for a better display and other calculation functions
-	function sumBreak(data) {
-		let result = null;
-		if (data && data.length > 1) {
-			result = data.reduce((a, b) => a + b);
-		} else {
-			result = data;
-		}
-		return result;
-	}
 
 	//add break submission
 	function handleAddBreak(shift) {
@@ -323,78 +208,31 @@ export default function Shift(history) {
       theme.palette.mode === 'dark' ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.25)',
     boxSizing: 'border-box',
   },
-}));
+	}));
 
+	//handle filter employee
+	function compare(a, b) {
+  		if (a.name < b.name) {
+  			return -1;
+  		}
+  		if (a.name > b.name) {
+  			return 1;
+  		}
+  		return 0;
+	}
+	let filteredShifts = null;
+	if (!isLoading) {
+		filteredShifts = shiftsState.filter((el) => {
+		let shiftLowercase = el.name.toLowerCase();
+		let searchTermLowercase = searchEmployeeState.toLowerCase();
+		return shiftLowercase.indexOf(searchTermLowercase) > -1;
+	});
+	}
 
-	//Load shifts
-	useEffect(() => {
-		set_table();
-	}, [active]);
-
-	return (
-		<>
-			<div className='col-12 col-md-11 m-auto'>
-				<h2 className='my-5 text-center'>
-					{orgState.name}
-				</h2>
-				<div className=" col mx-auto my-3 p-3 bg-light text-center d-flex flex-column">
-				<h5>Which employees should be displayed?</h5>
-				 <Stack className="col col-md-4 col-lg-4 m-auto my-3" direction="row" spacing={1} alignItems="center">
-        <Typography>Inactive only</Typography>
-        <AntSwitch onChange={handleSwitchChange} checked={active} inputProps={{ 'aria-label': 'ant design' }} />
-        <Typography>Active Only</Typography>
-					</Stack>
-				</div>
-				{modalUpdateShift}
-				{modalCreateShift}
-				{modalUpdateBreak}
-				<div className='d-flex justify-content-between'>
-					<OverlayTrigger
-						placement='top'
-						delay={{ show: 250, hide: 400 }}
-						overlay={renderTooltip}
-					>
-						<Button
-							variant='primary'
-							className='p-2 m-2'
-							onClick={() => {
-								setShowModalCreate(true);
-							}}
-						>
-							<AddCircleOutlineIcon className='mx-1' />
-							Add Shifts
-						</Button>
-					</OverlayTrigger>
-					<Link
-						className='px-3 my-3'
-						to='/dashboard'
-					>
-						Back
-					</Link>
-				</div>
-				<Table
-					className='mt-3 mb-5'
-					responsive
-					striped
-					bordered
-					hover
-					variant='dark'
-				>
-					<thead>
-						<tr>
-							<th>#</th>
-							{table_heading.map(
-								(th, index) => (
-									<th key={index}>
-										{th}
-									</th>
-								)
-							)}
-						</tr>
-					</thead>
-					<tbody>
-						{shiftsState &&
-							shiftsState.map((el, index) => (
+	//Display table shift list - consider creating a new component called shiftTable
+	let shiftList = <Loading/>;
+	if (!isLoading) {
+		shiftList = filteredShifts.sort(compare).map((el, index) => (
 								<tr
 									key={index}
 									className='m-auto text-center'
@@ -486,7 +324,88 @@ export default function Shift(history) {
 										) : null}
 									</td>
 								</tr>
-							))}
+							))
+	}
+
+	//Load shifts
+	useEffect(() => {
+		set_table();
+	}, [active, date]);
+
+	return (
+		<>
+			<div className='col-12 col-md-11 m-auto'>
+				<h2 className='my-5 text-center'>
+					{orgState.name}
+				</h2>
+				<div className=" col mx-auto my-3 p-3 bg-light text-center d-flex flex-column">
+					<div>
+				<h5>Which employees should be displayed?</h5>
+				 <Stack className="col-10 col-md-5 col-lg-3 mx-auto my-3 text-center" direction="row" spacing={2} alignItems="center">
+        <Typography>Inactive only</Typography>
+        <AntSwitch onChange={handleSwitchChange} checked={active} inputProps={{ 'aria-label': 'ant design' }} />
+        <Typography>Active Only</Typography>
+						</Stack></div>
+					<div className="col-8 col-md-6 col-lg-4 m-auto">
+					<Form.Group className="mb-3 " controlId="formBasicPassword">
+            <Form.Label>Search employee</Form.Label>
+               <Form.Control type="text" placeholder="Enter name" onChange={(e) => setSearchEmployeeState(e.target.value)} />
+					   	</Form.Group>
+						<div className="">
+							<Form.Label>Click to search by date</Form.Label>
+							<Datepicker parentCallback={parentCallback}/>
+						</div>
+					</div>
+				</div>
+				{modalUpdateShift}
+				{modalCreateShift}
+				{modalUpdateBreak}
+				<div className='d-flex justify-content-between'>
+					<OverlayTrigger
+						placement='top'
+						delay={{ show: 250, hide: 400 }}
+						overlay={renderTooltip}
+					>
+						<Button
+							variant='primary'
+							className='p-2 m-2'
+							onClick={() => {
+								setShowModalCreate(true);
+							}}
+						>
+							<AddCircleOutlineIcon className='mx-1' />
+							Add Shifts
+						</Button>
+					</OverlayTrigger>
+					<Link
+						className='px-3 my-3'
+						to='/dashboard'
+					>
+						Back
+					</Link>
+				</div>
+				<Table
+					className='mt-3 mb-5'
+					responsive
+					striped
+					bordered
+					hover
+					variant='dark'
+				>
+					<thead>
+						<tr>
+							<th>#</th>
+							{table_heading.map(
+								(th, index) => (
+									<th key={index} onClick={()=>{}}>
+										{th}
+									</th>
+								)
+							)}
+						</tr>
+					</thead>
+					<tbody>
+						{shiftList}						
 					</tbody>
 				</Table>
 			</div>
