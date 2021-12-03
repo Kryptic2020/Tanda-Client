@@ -106,7 +106,7 @@ export default function SignIn({ history }) {
 						value={formState.password}
 						onChange={handleChange}
 					/>
-					<span class='l-viewer'>
+					<span className='l-viewer'>
 						{visible ? (
 							<VisibilityIcon
 								className=' w-100'

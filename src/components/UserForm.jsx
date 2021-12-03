@@ -8,7 +8,7 @@ import { pattern } from '../utils/authValidation';
 
 export default function UserForm() {
 	//State management
-	const { store } = useGlobalState();
+	const { store, dispatch } = useGlobalState();
 	const { user_id,loggedInUser, userEmail } = store;
 	const initialFormState = {
 		username: loggedInUser,
@@ -41,7 +41,21 @@ export default function UserForm() {
 					setFormState({
 						...formState,
 						msg: data.msg,
-					});
+					});sessionStorage.setItem(
+							'user',
+							formState.username
+						);	sessionStorage.setItem(
+							'email',
+							formState.email
+						);
+						dispatch({
+							type: 'setLoggedInUser',
+							data: formState.username,
+						});
+						dispatch({
+							type: 'setUserEmail',
+							data: formState.email,
+						});
 				})
 				.catch((error) => console.log(error));
 		} else {
@@ -103,7 +117,7 @@ export default function UserForm() {
 						value={formState.password}
 						onChange={handleChange}
 					/>
-					<span class='p-viewer'>
+					<span className='p-viewer'>
 						{visible ? (
 							<VisibilityIcon
 								className=' w-100'
