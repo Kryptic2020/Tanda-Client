@@ -81,7 +81,7 @@ export function penaltyTimeCalc(start) {
 		new Date(start).getMinutes() +
 		new Date(start).getHours() * 60;
 	const day = 60 * 24;
-	return day - time;
+	return (day - time)/60;
 }
 
 //check if date is sunday
@@ -110,6 +110,7 @@ export function shiftCost(
 ) {
 	let cost = 0;
 	if (isSunday(date)) {
+
 		if (getOvernight(start, finish, coffee) === 0) {
 			cost =
 				getWorkedHours(start, finish, coffee) *
@@ -119,6 +120,7 @@ export function shiftCost(
 			const regular =
 				getOvernight(start, finish, coffee) -
 				penaltyTimeCalc(start);
+			
 			if (regular < 0) {
 				cost =
 					(penaltyTimeCalc(start) - regular) *
@@ -131,6 +133,7 @@ export function shiftCost(
 			}
 		}
 	} else if (isSaturday(date)) {
+
 		if (getOvernight(start, finish, coffee) === 0) {
 			cost =
 				getWorkedHours(start, finish, coffee) *
