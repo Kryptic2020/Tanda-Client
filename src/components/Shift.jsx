@@ -12,7 +12,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
-import { useGlobalState } from '../utils/stateContext';
 import {
 	getShifts,
 	deleteShift,
@@ -26,12 +25,10 @@ import ShiftForm from './ShiftForm';
 import BreakForm from './BreakForm';
 import Datepicker from './Datepicker';
 import { convertTime, convertDate, getWorkedHours, getOvernight, sumBreak, shiftCost, table_heading } from '../utils/shiftFunctions';
-import Loading from '../ui/Spinner/Loading';
 
 export default function Shift(history) {
 	//State management
-	const { store } = useGlobalState();
-	const { user_id } = store;
+	const user_id = sessionStorage.getItem('userId');
 	const [shiftsState, setShiftsState] = useState([]);
 	const [shiftState, setShiftState] = useState({});
 	const [orgState, setOrgState] = useState({});
@@ -230,8 +227,8 @@ export default function Shift(history) {
 	}
 
 	//Display table shift list - consider creating a new component called shiftTable
-	let shiftList = <Loading/>;
-	if (!isLoading) {
+	let shiftList = null;
+	if (!isLoading && user_id) {
 		shiftList = filteredShifts.sort(compare).map((el, index) => (
 								<tr
 									key={index}
@@ -258,7 +255,7 @@ export default function Shift(history) {
 										{sumBreak(el.break)}
 									</td>
 									<td>
-										{user_id && Number(user_id) ===
+										{Number(user_id) ===
 										el.user_id ? (
 											<AddCircleIcon
 												className='text-secondary'
@@ -298,7 +295,7 @@ export default function Shift(history) {
 										)}
 									</td>
 									<td>
-										{user_id && Number(user_id) ===
+										{Number(user_id) ===
 										el.user_id ? (
 											<CreateIcon
 												className='text-secondary'
@@ -311,7 +308,7 @@ export default function Shift(history) {
 										) : null}
 									</td>
 									<td>
-										{user_id && Number(user_id) ===
+										{Number(user_id) ===
 										el.user_id ? (
 											<DeleteIcon
 												className='text-secondary'

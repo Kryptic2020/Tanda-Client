@@ -3,6 +3,32 @@ This challenge is to create a highly simplified version of the Tanda web app fro
 
 ---
 
+## Features
+* Login, signup, forgot password, reset password features.  
+* Organizations management.  
+* Shifts and breaks management.  
+* Allow users to change their own name, email address, or password.  
+* Allow users to modify or delete existing shifts.  
+* A table of prior employees shifts (inactive users table).  
+* Allow users to filter which shifts are visible based on employee or a date range or both.  
+* When creating a shift, if the finish time of a shift is earlier than the start time, the shift is considered overnight.   
+* The hourly rate is doubled for shifts worked on a Sunday.   
+* People often take more than one break when they work. For this project, instead of a shift having a single break length, it could have multiple.  
+* Users to belong to more than one organisation. 
+* Datepicker and Timepicker components.  
+* Filter and sorting.  
+* React SPA. 
+* Welcome email sent to new users
+* Reset password link sent to users when a forgot password is claimed.   
+
+---  
+
+## Testing
+- RSPEC - backend API - Run the test using the command ```rspec``` on the API root folder, in the terminal.  
+- Jest - frontend - Run the test using the command ```npm run test``` on the client root folder, in the terminal.  
+
+---  
+
 ## Teck Stack
 * Ruby on Rails - backend
 * ReactJs - Frontend 
